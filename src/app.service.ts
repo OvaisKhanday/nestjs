@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   Injectable,
@@ -12,7 +14,7 @@ export class AppService {
   }
 
   onOrderCreated(
-    // webhookData: any,
+    webhookData: any,
     rawBody: Buffer | undefined,
     signature: Buffer,
   ) {
@@ -21,7 +23,31 @@ export class AppService {
 
     if (!rawBody || !signature) throw new BadRequestException();
 
+    if (!webhookData || !rawBody || !signature) throw new BadRequestException();
+
+    const userEmail = webhookData?.attributes?.user_email;
+    const storeId = webhookData?.attributes?.store_id;
+    const variantId = webhookData?.attributes?.first_order_item?.variant_id;
+
+    if (!userEmail) {
+      throw new BadRequestException('Email not found');
+    }
+
+    if (!storeId || !variantId) {
+      throw new BadRequestException('Product Details not found');
+    }
+
+    if (storeId !== 243407 || variantId !== 1092006) {
+      throw new BadRequestException('Payment was not for Taillens product');
+    }
+
     const secret = '1234567890';
+
+    console.log({
+      userEmail,
+      storeId,
+      variantId,
+    });
 
     const hmac = createHmac('sha256', secret);
     const digest = Buffer.from(
@@ -38,6 +64,8 @@ export class AppService {
       console.log("Didn't match");
       throw new UnauthorizedException('Invalid Signature');
     }
+
+    console.log('Matched');
 
     // if (signature !== lemonSqueezyConstants.signatureSecret) {
     //   throw new UnauthorizedException('Invalid Signature');

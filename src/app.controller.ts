@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Post, RawBody } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, RawBody } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -12,7 +12,7 @@ export class AppController {
 
   @Post('order_created')
   onOrderCreated(
-    // @Body() { data: webhookData }: any,
+    @Body() { data: webhookData }: any,
     // @Req() request: RawBodyRequest<Request>,
     @RawBody() rawBody: Buffer | undefined,
     @Headers() headers: Record<string, string>,
@@ -22,7 +22,7 @@ export class AppController {
       rawBody: rawBody,
     });
     const signature = Buffer.from(headers['x-signature'] || '', 'utf-8');
-    this.appService.onOrderCreated(rawBody, signature);
+    this.appService.onOrderCreated(webhookData, rawBody, signature);
     return { message: 'License created successfully' };
   }
 }
