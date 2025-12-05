@@ -27,6 +27,7 @@ export class AppService {
 
     const userEmail = webhookData?.attributes?.user_email;
     const storeId = webhookData?.attributes?.store_id;
+    const productId = webhookData?.attributes?.first_order_item?.product_id;
     const variantId = webhookData?.attributes?.first_order_item?.variant_id;
 
     if (!userEmail) {
@@ -37,15 +38,17 @@ export class AppService {
       throw new BadRequestException('Product Details not found');
     }
 
-    if (storeId !== 243407 || variantId !== 1092006) {
+    if (storeId !== 243407 || productId != 693993 || variantId !== 1092006) {
       throw new BadRequestException('Payment was not for Taillens product');
     }
 
     const secret = '1234567890';
 
+    console.log('product is valid');
     console.log({
       userEmail,
       storeId,
+      productId,
       variantId,
     });
 
