@@ -1,4 +1,5 @@
 import {
+  All,
   Body,
   Controller,
   Get,
@@ -36,7 +37,7 @@ export class AppController {
     return { message: 'License created successfully' };
   }
 
-  @Post('phonepe/webhook/order-created')
+  @All('phonepe/webhook/order-created')
   onPhonePeOrderCreated(
     @Body() body: any,
     @Headers() headers: Record<string, string>,
