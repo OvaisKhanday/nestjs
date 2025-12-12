@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Headers, Post, RawBody } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  RawBody,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppService } from './app.service';
+import WebhookOrderCreatedDto from './dto/webhook-order-created-dto';
 
 @Controller()
 export class AppController {
@@ -12,7 +21,8 @@ export class AppController {
 
   @Post('order_created')
   onOrderCreated(
-    @Body() { data: webhookData }: any,
+    @Body(new ValidationPipe({ whitelist: true, transform: true }))
+    body: WebhookOrderCreatedDto,
     // @Req() request: RawBodyRequest<Request>,
     @RawBody() rawBody: Buffer | undefined,
     @Headers() headers: Record<string, string>,
@@ -22,7 +32,7 @@ export class AppController {
       rawBody: rawBody,
     });
     const signature = Buffer.from(headers['x-signature'] || '', 'utf-8');
-    this.appService.onOrderCreated(webhookData, rawBody, signature);
+    this.appService.onOrderCreated(body, rawBody, signature);
     return { message: 'License created successfully' };
   }
 }
