@@ -35,4 +35,14 @@ export class AppController {
     this.appService.onOrderCreated(body, rawBody, signature);
     return { message: 'License created successfully' };
   }
+
+  @Post('phonepe/webhook/order-created')
+  onPhonePeOrderCreated(
+    @Body() body: any,
+    @Headers() headers: Record<string, string>,
+  ): { message: string } {
+    const authHeaderSha = headers['authorization'];
+    this.appService.onPhonePeOrderCreated(authHeaderSha, body);
+    return { message: 'Order Acknowledged' };
+  }
 }

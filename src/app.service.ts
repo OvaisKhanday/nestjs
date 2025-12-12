@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { createHmac, timingSafeEqual } from 'crypto';
 import WebhookOrderCreatedDto from './dto/webhook-order-created-dto';
+import { StandardCheckoutClient, Env } from 'pg-sdk-node';
 
 @Injectable()
 export class AppService {
@@ -80,5 +81,51 @@ export class AppService {
 
     // await this.em.persistAndFlush(license);
     // await this.emailService.sendLicenseKeyEmail(userEmail, randomLicenseKey);
+  }
+
+  onPhonePeOrderCreated(authHeaderSha: string, responseBody: any) {
+    const PHONEPE_CLIENT_ID = 'TEST-M22AKECRVM1N6_25041';
+    const PHONEPE_CLIENT_SECRET =
+      'YWYxNjA5ZWMtNzhlNy00MjAxLThlMDgtZjFmOWEwNDY0NmEz';
+    const username = 'ovaisTest';
+    const password = 'password1234';
+
+    console.log('#################### PHONEPE WEBHOOK ####################');
+    const rawResponseString = JSON.stringify(responseBody);
+
+    console.log({
+      authHeaderSha,
+      responseBody,
+      rawResponseString,
+    });
+
+    const client = StandardCheckoutClient.getInstance(
+      PHONEPE_CLIENT_ID,
+      PHONEPE_CLIENT_SECRET,
+      1,
+      Env.SANDBOX,
+    );
+
+    try {
+      const callbackResponse = client.validateCallback(
+        username,
+        password,
+        authHeaderSha,
+        rawResponseString,
+      );
+      const orderId = callbackResponse.payload.orderId;
+      const state = callbackResponse.payload.state;
+
+      console.log({
+        orderId,
+        state,
+        payload: callbackResponse.payload,
+        type: callbackResponse.type,
+      });
+    } catch (error) {
+      console.log('Invalid callback: ', error);
+    }
+
+    console.log('#################### END ####################');
   }
 }
