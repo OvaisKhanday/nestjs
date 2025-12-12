@@ -84,9 +84,9 @@ export class AppService {
   }
 
   onPhonePeOrderCreated(authHeaderSha: string, responseBody: any) {
-    const PHONEPE_CLIENT_ID = 'TEST-M22AKECRVM1N6_25041';
+    const PHONEPE_CLIENT_ID = 'M22AKECRVM1N6_2512121518';
     const PHONEPE_CLIENT_SECRET =
-      'YWYxNjA5ZWMtNzhlNy00MjAxLThlMDgtZjFmOWEwNDY0NmEz';
+      'OTU3NTVjZWItYWUzMy00ODVjLTk4ODItNzhkMTUzNGUxZDdj';
     const username = 'ovaisTest';
     const password = 'password1234';
 
@@ -106,25 +106,21 @@ export class AppService {
       Env.SANDBOX,
     );
 
-    try {
-      const callbackResponse = client.validateCallback(
-        username,
-        password,
-        authHeaderSha,
-        rawResponseString,
-      );
-      const orderId = callbackResponse.payload.orderId;
-      const state = callbackResponse.payload.state;
+    const callbackResponse = client.validateCallback(
+      username,
+      password,
+      authHeaderSha,
+      rawResponseString,
+    );
+    const orderId = callbackResponse.payload.orderId;
+    const state = callbackResponse.payload.state;
 
-      console.log({
-        orderId,
-        state,
-        payload: callbackResponse.payload,
-        type: callbackResponse.type,
-      });
-    } catch (error) {
-      console.log('Invalid callback: ', error);
-    }
+    console.log({
+      orderId,
+      state,
+      payload: callbackResponse.payload,
+      type: callbackResponse.type,
+    });
 
     console.log('#################### END ####################');
   }
